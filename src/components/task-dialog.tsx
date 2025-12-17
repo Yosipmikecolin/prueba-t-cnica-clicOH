@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState, useCallback } from "react";
+import { memo, useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,6 +33,18 @@ export const TaskDialog = memo(function TaskDialog({
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      if (mode === "create") {
+        setTitle("");
+        setDescription("");
+      } else if (task) {
+        setTitle(task.title);
+        setDescription(task.description);
+      }
+    }
+  }, [open, mode, task]);
 
   const handleSave = useCallback(async () => {
     if (!title.trim() || !description.trim()) return;

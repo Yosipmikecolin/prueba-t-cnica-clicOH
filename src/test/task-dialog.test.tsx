@@ -63,9 +63,12 @@ describe("Task-dialog", () => {
   it("restaura valores al cancelar en modo edición", async () => {
     const user = userEvent.setup();
     const task = {
-      id: "1",
+      _id: "1",
       title: "Original",
       description: "Texto original",
+      completed: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const { onOpenChange } = setup({
@@ -79,5 +82,40 @@ describe("Task-dialog", () => {
     await user.click(screen.getByText("Cancelar"));
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("actualiza los campos cuando cambian los props", () => {
+    const { rerender } = render(
+      <TaskDialog
+        open={true}
+        mode="create"
+        onSave={jest.fn()}
+        onOpenChange={jest.fn()}
+      />
+    );
+
+    expect(screen.getByLabelText("Título")).toHaveValue("");
+
+    const task = {
+      _id: "1",
+      title: "Nueva Info",
+      description: "Nueva Desc",
+      completed: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    rerender(
+      <TaskDialog
+        open={true}
+        mode="edit"
+        task={task}
+        onSave={jest.fn()}
+        onOpenChange={jest.fn()}
+      />
+    );
+
+    expect(screen.getByLabelText("Título")).toHaveValue("Nueva Info");
+    expect(screen.getByLabelText("Descripción")).toHaveValue("Nueva Desc");
   });
 });
